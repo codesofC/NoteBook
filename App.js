@@ -1,47 +1,35 @@
+
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Home from './screens/Home';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FontAwesome6 } from '@expo/vector-icons';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Note from './screens/Note';
+import Todo from './screens/Todo';
+import { RouteNameContext } from "./utils/useRouteName"
+import { NotesContext } from "./utils/useNotes"
+import { makeTodos, notes, todos } from './constants';
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
 
-  const [navigateToMenu, setNavigateToMenu] = useState(false)
+  const [routeName, setRouteName] = useState("Anotaçoes")
+  const [myNotes, setMyNotes] = useState(notes);
+  const [todos, setTodos] = useState(makeTodos)
+
 
   return (
-    <View style={styles.container}>
-      <View style={styles.nav}>
-        <MaterialCommunityIcons 
-          name="notebook" size={24} 
-          color={!navigateToMenu ? '#ff9b00' : '#242424'}
-          onPress={() => setNavigateToMenu(false)}
-        />
-        <FontAwesome6 
-          name="check-square" 
-          size={24} 
-          color={navigateToMenu ? '#ff9b00' : '#242424'}
-          onPress={() => setNavigateToMenu(true)}
-        />
-      </View>
-      <Home />
-    </View>
+    <RouteNameContext.Provider value={{ routeName, setRouteName }}>
+      <NotesContext.Provider value={{ myNotes, setMyNotes, todos, setTodos }} >
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName={"Anotaçoes"}>
+            <Stack.Screen name='Anotaçoes' component={Home} />
+            <Stack.Screen name='Anotacao' component={Note} />
+            <Stack.Screen name="Lista" component={Todo} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </NotesContext.Provider>
+    </RouteNameContext.Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 20,
-    paddingHorizontal: "5%",
-    backgroundColor: "#000",
-    minHeight: "100%",
-    gap: 10
-  },
-  nav: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 50,
-    paddingVertical: 10,
-  }
-});
